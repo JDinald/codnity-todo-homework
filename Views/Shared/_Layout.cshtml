@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="with=device-width"/>
+    <title>@ViewBag.Title TODO</title>
+</head>
+<body>
+    <div>
+        @RenderBody()
+    </div>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+<style>
+    .todo-item {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        padding: 50px;
+        margin-bottom: 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .todo-text {
+        margin-right: 10px;
+    }
+
+    .completed {
+        text-decoration: line-through;
+        color: grey;
+    }
+
+    .delete-button, .add-button {
+        color: white;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 5px; 
+        font-size: 0.8rem; 
+    }
+
+    .delete-button {
+        color: white;
+        background-color: red;
+        border: none;
+        cursor: pointer;
+        padding: 3px 3px;
+    }
+
+    .add-button {
+        color: white;
+        background-color: green;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    .input-group input {
+        margin-right: 10px;
+    }
+</style>

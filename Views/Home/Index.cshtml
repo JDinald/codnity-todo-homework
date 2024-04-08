@@ -1,0 +1,88 @@
+<div id="app">
+    <h1>Todo List</h1>
+    <div>
+        <input v-model="filterDescription" placeholder="Filter by description">
+        <input v-model="newTodoDescription" placeholder="Add a new todo">
+        <button v-on:click="addTodo" class="add-button">Add</button>
+    </div>
+    <ul>
+        <li v-for="todo in todos">
+            <span :class="{ completed: todo.isDone }" class="todo-text">
+                {{ todo.description }}
+            </span>
+            <input type="checkbox" v-model="todo.isDone" v-on:change="toggleCompletion(todo.id)">
+            <button v-on:click="deleteTodo(todo.id)" class="delete-button">Delete</button>
+        </li>     
+    </ul>
+</div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        app = new Vue({
+            el: '#app',
+            data: {
+                todos: [],
+                newTodoDescription: '',
+                filterDescription: ''
+            },
+            mounted() {
+                this.fetchTodos();
+            },
+            watch: {
+                filterDescription: function (newDescription, oldDescription) {
+                    console.log("Watcher triggered", newDescription);
+                    this.fetchFilteredTodos();
+                }
+            },
+            methods: {
+                fetchTodos() {
+                    axios.get('/api/todo')
+                        .then(response => {
+                            this.todos = response.data;
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                },
+                addTodo() {
+                    const todo = {
+                        description: this.newTodoDescription,
+                        isDone: false
+                    };
+                    axios.post('/api/todo', todo)
+                        .then(response => {
+                            this.todos.push(response.data);
+                            this.newTodoDescription = ''; 
+                        })
+                        .catch(error => console.error('Error adding todo:', error));
+                },
+                toggleCompletion(todoId) {
+                    const todo = this.todos.find(t => t.id === todoId);
+                    if (todo) {
+                        axios.put(`/api/todo/${todoId}`, { isDone: todo.isDone })
+                            .catch(error => {
+                                console.error('Error toggling todo completion:', error);
+                                todo.isDone = !todo.isDone;
+                            });
+                    }
+                },
+                deleteTodo(todoId) {
+                    axios.delete(`/api/todo/${todoId}`)
+                        .then(() => {
+                            this.todos = this.todos.filter(t => t.id !== todoId);
+                        })
+                        .catch(error => console.error('Error deleting todo:', error));
+                },
+                fetchFilteredTodos() {
+                    axios.get(`/api/todo/filter?description=${encodeURIComponent(this.filterDescription)}`)
+                        .then(response => {
+                            this.todos = response.data;
+                        })
+                        .catch(error => console.error('Error fetching filtered todos:', error));
+                }
+            }
+        });
+    </script>
+}
